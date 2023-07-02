@@ -1,6 +1,7 @@
 package pro.sky.skyprospringstream.services;
-
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import pro.sky.skyprospringstream.exceptions.WrongSymbolsException;
 import pro.sky.skyprospringstream.model.Employee;
 
 import java.util.*;
@@ -15,6 +16,14 @@ public class EmployeeBookServiceImpl implements pro.sky.skyprospringstream.servi
     }
 
     public String addEmployee(String lastName, String firstName, String patronymicName, int salary, String department){
+
+        if (!(StringUtils.isAlpha(lastName) && (StringUtils.isAlpha(firstName) && StringUtils.isAlpha(patronymicName)))){
+            throw new WrongSymbolsException("Wrong symbols in names");
+        }
+        StringUtils.capitalize(lastName);
+        StringUtils.capitalize(firstName);
+        StringUtils.capitalize(patronymicName);
+
         Employee employee = new Employee(lastName, firstName, patronymicName, salary, department);
         if (employees.containsKey(employee.getFullName())){
             throw new RuntimeException("This employee is already in database");
@@ -61,6 +70,7 @@ public class EmployeeBookServiceImpl implements pro.sky.skyprospringstream.servi
     }
 
     public String getEmployeesDepartmentsAll(){
+
         List<String> departments = employees.values().stream()
                 .map(employee -> employee.getDepartment())
                 .distinct()
